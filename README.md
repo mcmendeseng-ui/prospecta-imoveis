@@ -43,3 +43,16 @@ IBGE: renda per capita de Serra, Censo 2022, 10295/13431 (R$ 1.541,03). NASA: cl
 
 ## Mapa de oportunidades
 Leaflet 1.9.4 e OpenStreetMap. O mapa acompanha filtros e abre a análise do anúncio. Coordenadas aproximadas de bairro são identificadas explicitamente e não representam a localização exata do imóvel. Imóveis importados podem informar latitude, longitude, locationPrecision (property ou neighborhood), locationSource. Registros sem coordenadas permanecem na lista e são contados como não mapeados.
+
+
+## Análise territorial e investimentos — 07/10/2026
+- Catálogo oficial de 5.571 municípios do IBGE, com códigos e estados; cobertura de anúncios independente da cobertura territorial.
+- Renda domiciliar per capita: Censo 2022, tabela 10295/13431; valores não disponíveis permanecem vazios.
+- Frota SENATRAN: agosto de 2026. Frota relevante = automóveis + caminhonetes + camionetas + utilitários; frota total é exibida separadamente. Correspondência por UF e nome normalizado, sem aproximação entre municípios. Não representa tráfego na rua.
+- Matriz cruza ofertas com frota, renda, programa de áreas, preços e cenários financeiros. Seleção nacional não gera ofertas fictícias onde não há coleta.
+- Referência preliminar por m² só é calculada com pelo menos 3 outros anúncios do mesmo bairro, município, negociação, uso e área ±30%. Não equivale a preços efetivos de transação ou avaliação de mercado.
+- Coleta ampliada a galpões, lojas, pontos e prédios comerciais em venda e locação da fonte pública existente, com número limitado de páginas por consulta.
+- Violência, terrenos baldios, inundação e condição técnica ainda exigem integração territorial validada e/ou vistoria; nenhum valor de risco é inventado. Climatologia de Serra não é copiada para outros municípios.
+- A coleta nacional pode receber HTTP 403; nessas situações conserva a última base publicada e registra falha no log. A atualização automática depende do acesso às fontes, não é garantida por estarem abertas.
+
+Para atualizar a base nacional: `python scripts/territorial_data.py` (requer openpyxl). O monitor inclui a tentativa de atualização nacional e conserva a última coleta quando falha.

@@ -98,20 +98,20 @@
       }
     },
     "times": {
-      "data": 0.139,
+      "data": 0.116,
       "process": 0.03
     }
   },
-  "checkedAt": "2026-10-07T02:21:25.029257+00:00",
+  "checkedAt": "2026-10-07T18:58:34.509760+00:00",
   "sources": {
     "income": {
       "status": "ok",
-      "checkedAt": "2026-10-07T02:21:25.029257+00:00",
+      "checkedAt": "2026-10-07T18:58:34.509760+00:00",
       "url": "https://servicodados.ibge.gov.br/api/v3/agregados/10295/periodos/2022/variaveis/13431?localidades=N6[3205002]&classificacao=2[6794]|86[95251]|58[95253]"
     },
     "climate": {
       "status": "ok",
-      "checkedAt": "2026-10-07T02:21:25.029257+00:00",
+      "checkedAt": "2026-10-07T18:58:34.509760+00:00",
       "url": "https://power.larc.nasa.gov/api/temporal/climatology/point?parameters=T2M,PRECTOTCORR,WS10M&community=RE&longitude=-40.3&latitude=-20.12&format=JSON"
     }
   }

@@ -1,9 +1,10 @@
 """Public territorial APIs and public commercial listings. No corporate data."""
 import json, gzip, re, datetime, urllib.request, urllib.parse, concurrent.futures
+from territorial_data import run as update_territory, key
 from pathlib import Path
 from bs4 import BeautifulSoup
 ROOT=Path(__file__).resolve().parents[1]
-CATALOG='https://www.alextongo.com/aluguel-estudante/comerciais'
+CATALOGS=['https://www.alextongo.com/aluguel-estudante/comerciais','https://www.alextongo.com/venda/comerciais']
 INCOME='https://servicodados.ibge.gov.br/api/v3/agregados/10295/periodos/2022/variaveis/13431?localidades=N6[3205002]&classificacao=2[6794]|86[95251]|58[95253]'
 CLIMATE='https://power.larc.nasa.gov/api/temporal/climatology/point?parameters=T2M,PRECTOTCORR,WS10M&community=RE&longitude=-40.3&latitude=-20.12&format=JSON'
 
@@ -24,21 +25,27 @@ def parse_listing(url, content):
     # Only the current listing, before the recommendations section.
     text=soup.get_text(' ',strip=True).split('Imóveis Semelhantes')[0]
     ref=re.search(r'ref-(\d+)',url)
-    area=re.search(r'(\d[\d.,\s]*)\s*m[²2]\s*de área privativa',text,re.I)
-    price=re.search(r'Aluguel Estudante:\s*R\$\s*(\d[\d.,\s]*)',text,re.I)
+    area=re.search(r'(\d[\d.,\s]*)\s*m[²2]\s*de área (privativa|total)',text,re.I)
+    purchase='-venda-ref-' in url
+    # Read the displayed headline price, not amounts embedded in free-text descriptions.
+    price=re.search(r'R\$\s*(\d[\d.,\s]*)',text,re.I)
     if not (ref and area and price):return None
     square=br_number(area.group(1));amount=br_number(price.group(1))
     if square<=0 or amount<=0:return None
-    # Bound focus for the first monitored city; do not infer location from a generic title.
-    if 'serra-' not in url:return None
-    district_match=re.search(r'galpao-deposito-serra-(.+?)-aluguel',url)
-    district=district_match.group(1).replace('-',' ').title() if district_match else 'A confirmar'
-    coordinates=json.loads((ROOT/'data/neighborhoods.json').read_text()).get(district,{})
+    municipal=json.loads((ROOT/'data/municipalities.json').read_text())['cities']
+    city=next((c for c in municipal if c['state']=='ES' and '-'+key(c['city']).lower().replace(' ','-')+'-' in url),None)
+    if not city:return None
+    slug=key(city['city']).lower().replace(' ','-')
+    match=re.search(re.escape(slug)+r'-(.+?)-(?:aluguel|venda)',url)
+    district=re.sub(r'-\d+-garagen?s?','',match.group(1)).replace('-',' ').title() if match else 'A confirmar'
+    coordinates=json.loads((ROOT/'data/neighborhoods.json').read_text()).get(district,{}) if city['city']=='Serra' else {}
     image=soup.find('meta',attrs={'property':'og:image'})
-    return {**coordinates,'id':ref.group(1),'title':title.split('(referência')[0].strip(),'city':'Serra','state':'ES','district':district,'type':'Locação','area':square,'price':amount,'url':url,'source':'Imobiliária Alex Tongo','sourceDate':datetime.date.today().isoformat(),'image':image.get('content') if image else None,'isDemo':False,'environment':'Não avaliado','status':'Anúncio localizado; disponibilidade a confirmar'}
+    return {**coordinates,'id':ref.group(1)+('-compra' if purchase else ''),'title':title.split('(referência')[0].strip(),'city':city['city'],'state':city['state'],'ibgeCode':city['id'],'district':district,'type':'Compra' if purchase else 'Locação','propertyKind':url.split('/imovel/')[1].split('-'+slug+'-')[0],'area':square if square>=20 else None,'advertisedArea':square,'areaEvidence':'Metragem abaixo de 20 m² em anúncio comercial; confirmar na fonte' if square<20 else 'Metragem anunciada; confirmar pavimentos e área útil','areaKind':area.group(2),'price':amount,'url':url,'source':'Imobiliária Alex Tongo','sourceDate':datetime.date.today().isoformat(),'image':image.get('content') if image else None,'isDemo':False,'environment':'Não avaliado','status':'Anúncio localizado; disponibilidade a confirmar'}
 
 def run():
     now=datetime.datetime.now(datetime.timezone.utc).isoformat()
+    try:update_territory()
+    except Exception as e:print('Atualização nacional falhou; última base preservada:',e)
     territory=json.loads((ROOT/'data/territory.json').read_text())
     statuses={}
     for name,url in [('income',INCOME),('climate',CLIMATE)]:
@@ -52,8 +59,11 @@ def run():
     (ROOT/'data/territory.json').write_text(json.dumps(territory,ensure_ascii=False,indent=2)+'\n')
     file=ROOT/'data/listings.json';old=json.loads(file.read_text());index={(str(p['id']),p.get('source','')):p for p in old['listings']};events=old.get('events',[])
     try:
-        catalog=BeautifulSoup(get(CATALOG),'html.parser')
-        urls=sorted(set(urllib.parse.urljoin(CATALOG,a['href']) for a in catalog.find_all('a',href=True) if '/imovel/galpao-deposito-serra-' in a['href'] and '-aluguel-ref-' in a['href']))[:24]
+        urls=[]
+        for catalog_url in CATALOGS:
+            catalog=BeautifulSoup(get(catalog_url),'html.parser')
+            urls+=sorted(set(urllib.parse.urljoin(catalog_url,a['href']) for a in catalog.find_all('a',href=True) if any('/imovel/'+k+'-' in a['href'] for k in ['galpao-deposito','loja','ponto-comercial','predio-comercial']) and ('-aluguel-ref-' in a['href'] or '-venda-ref-' in a['href'])))[:24]
+        urls=list(dict.fromkeys(urls))
         if not urls:raise ValueError('Catálogo não apresentou links reconhecidos; último conjunto mantido')
         # Small bounded batch, no evasive retries on blocks or rate limits.
         def fetch_listing(u):
@@ -67,7 +77,9 @@ def run():
                 if previous is None:events.append({'id':f"{p['source']}:{p['id']}:{now}",'title':p['title'],'kind':'new','message':'Novo anúncio público localizado','at':now})
                 elif previous.get('price')!=p['price']:events.append({'id':f"{p['source']}:{p['id']}:{now}",'title':p['title'],'kind':'price_change','message':f"Preço alterado de {previous.get('price')} para {p['price']}",'at':now})
                 if previous:p={**previous,**p}
-                p['income']=territory.get('income');p['incomePeriod']='2022';p['marketEvidence']='IBGE Censo 2022, tabela 10295, renda per capita municipal. Preço e área são anunciados.'
+                municipal=json.loads((ROOT/'data/municipalities.json').read_text())
+                city=next((c for c in municipal['cities'] if c['id']==p.get('ibgeCode')), {})
+                p.update({k:city[k] for k in ['income','fleet','fleetTotal'] if k in city});p['fleetPeriod']=municipal['fleetPeriod'];p['incomePeriod']='2022';p['marketEvidence']='IBGE Censo 2022, tabela 10295, renda per capita municipal. Preço e área são anunciados.'
                 index[key]=p
         if not checked:raise ValueError('Formato dos anúncios não reconhecido; coleta não validada')
         old.update(updatedAt=now,status='public_connected',listings=list(index.values()),events=events[-500:],checkedListings=checked)
