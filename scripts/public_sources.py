@@ -14,7 +14,7 @@ def get(url):
     if len(b)>10_000_000:raise ValueError('Resposta excedeu o limite')
     return gzip.decompress(b) if b[:2]==b'\x1f\x8b' else b
 
-def br_number(s):return float(s.replace('.','').replace(',','.'))
+def br_number(s):return float(re.sub(r'\s+', '', s).replace('.','').replace(',','.'))
 
 def parse_listing(url, content):
     soup=BeautifulSoup(content,'html.parser')
@@ -24,8 +24,8 @@ def parse_listing(url, content):
     # Only the current listing, before the recommendations section.
     text=soup.get_text(' ',strip=True).split('Imóveis Semelhantes')[0]
     ref=re.search(r'ref-(\d+)',url)
-    area=re.search(r'([\d.,]+)\s*m[²2]\s*de área privativa',text,re.I)
-    price=re.search(r'Aluguel Estudante:\s*R\$\s*([\d.,]+)',text,re.I)
+    area=re.search(r'(\d[\d.,\s]*)\s*m[²2]\s*de área privativa',text,re.I)
+    price=re.search(r'Aluguel Estudante:\s*R\$\s*(\d[\d.,\s]*)',text,re.I)
     if not (ref and area and price):return None
     square=br_number(area.group(1));amount=br_number(price.group(1))
     if square<=0 or amount<=0:return None
@@ -33,8 +33,9 @@ def parse_listing(url, content):
     if 'serra-' not in url:return None
     district_match=re.search(r'galpao-deposito-serra-(.+?)-aluguel',url)
     district=district_match.group(1).replace('-',' ').title() if district_match else 'A confirmar'
+    coordinates=json.loads((ROOT/'data/neighborhoods.json').read_text()).get(district,{})
     image=soup.find('meta',attrs={'property':'og:image'})
-    return {'id':ref.group(1),'title':title.split('(referência')[0].strip(),'city':'Serra','state':'ES','district':district,'type':'Locação','area':square,'price':amount,'url':url,'source':'Imobiliária Alex Tongo','sourceDate':datetime.date.today().isoformat(),'image':image.get('content') if image else None,'isDemo':False,'environment':'Não avaliado','status':'Anúncio localizado; disponibilidade a confirmar'}
+    return {**coordinates,'id':ref.group(1),'title':title.split('(referência')[0].strip(),'city':'Serra','state':'ES','district':district,'type':'Locação','area':square,'price':amount,'url':url,'source':'Imobiliária Alex Tongo','sourceDate':datetime.date.today().isoformat(),'image':image.get('content') if image else None,'isDemo':False,'environment':'Não avaliado','status':'Anúncio localizado; disponibilidade a confirmar'}
 
 def run():
     now=datetime.datetime.now(datetime.timezone.utc).isoformat()

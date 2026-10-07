@@ -22,7 +22,11 @@
       "isDemo": false,
       "healthEvidence": "Área construída distribuída em pavimentos; depósito em mezanino. Área térrea útil e capacidade de piso precisam ser confirmadas.",
       "marketEvidence": "Renda: IBGE Censo 2022, tabela 10295, variável 13431, município de Serra. Não é renda do bairro. Preço e área são anunciados; disponibilidade não confirmada.",
-      "status": "Anúncio localizado; disponibilidade a confirmar"
+      "status": "Anúncio localizado; disponibilidade a confirmar",
+      "latitude": -20.1855851,
+      "longitude": -40.232802,
+      "locationPrecision": "neighborhood",
+      "locationSource": "OpenStreetMap / Nominatim · centro aproximado do bairro · consulta 07/10/2026"
     },
     {
       "id": "1007",
@@ -44,7 +48,11 @@
       "isDemo": false,
       "healthEvidence": "O anúncio menciona dois mezaninos e acesso por duas ruas. Confirmar área térrea e viabilidade para loja.",
       "marketEvidence": "Renda: IBGE Censo 2022, tabela 10295, variável 13431, município de Serra. Não é renda do bairro. Preço e área são anunciados; disponibilidade não confirmada.",
-      "status": "Anúncio localizado; disponibilidade a confirmar"
+      "status": "Anúncio localizado; disponibilidade a confirmar",
+      "latitude": -20.2195582,
+      "longitude": -40.2620842,
+      "locationPrecision": "neighborhood",
+      "locationSource": "OpenStreetMap / Nominatim · centro aproximado do bairro · consulta 07/10/2026"
     },
     {
       "id": "876",
@@ -66,7 +74,11 @@
       "isDemo": false,
       "healthEvidence": "Área anunciada de 721 m² e escritório de 17 m². Confirmar circulação, estacionamento, acesso e uso comercial.",
       "marketEvidence": "Renda: IBGE Censo 2022, tabela 10295, variável 13431, município de Serra. Não é renda do bairro. Preço e área são anunciados; disponibilidade não confirmada.",
-      "status": "Anúncio localizado; disponibilidade a confirmar"
+      "status": "Anúncio localizado; disponibilidade a confirmar",
+      "latitude": -20.2180358,
+      "longitude": -40.2663839,
+      "locationPrecision": "neighborhood",
+      "locationSource": "OpenStreetMap / Nominatim · centro aproximado do bairro · consulta 07/10/2026"
     },
     {
       "id": "1010",
@@ -75,7 +87,7 @@
       "state": "ES",
       "district": "Civit I",
       "type": "Locação",
-      "area": 89.0,
+      "area": 4138.89,
       "price": 105000.0,
       "url": "https://www.alextongo.com/imovel/galpao-deposito-serra-civit-i-aluguel-ref-1010/",
       "source": "Imobiliária Alex Tongo",
@@ -86,7 +98,12 @@
       "status": "Anúncio localizado; disponibilidade a confirmar",
       "income": 1541.03,
       "incomePeriod": "2022",
-      "marketEvidence": "IBGE Censo 2022, tabela 10295, renda per capita municipal. Preço e área são anunciados."
+      "marketEvidence": "IBGE Censo 2022, tabela 10295, renda per capita municipal. Preço e área são anunciados.",
+      "latitude": -20.1585273,
+      "longitude": -40.2306678,
+      "locationPrecision": "neighborhood",
+      "locationSource": "OpenStreetMap / Nominatim · centro aproximado do bairro · consulta 07/10/2026",
+      "healthEvidence": "Área construída anunciada 4.138,89 m²; terreno 3.072,65 m². Confirmar áreas por pavimento e área térrea útil."
     }
   ],
   "events": [

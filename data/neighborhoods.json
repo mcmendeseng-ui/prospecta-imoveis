@@ -1,0 +1,26 @@
+{
+  "Alterosas": {
+    "latitude": -20.1855851,
+    "longitude": -40.232802,
+    "locationPrecision": "neighborhood",
+    "locationSource": "OpenStreetMap / Nominatim · centro aproximado do bairro · consulta 07/10/2026"
+  },
+  "São Diogo I": {
+    "latitude": -20.2195582,
+    "longitude": -40.2620842,
+    "locationPrecision": "neighborhood",
+    "locationSource": "OpenStreetMap / Nominatim · centro aproximado do bairro · consulta 07/10/2026"
+  },
+  "Jardim Limoeiro": {
+    "latitude": -20.2180358,
+    "longitude": -40.2663839,
+    "locationPrecision": "neighborhood",
+    "locationSource": "OpenStreetMap / Nominatim · centro aproximado do bairro · consulta 07/10/2026"
+  },
+  "Civit I": {
+    "latitude": -20.1585273,
+    "longitude": -40.2306678,
+    "locationPrecision": "neighborhood",
+    "locationSource": "OpenStreetMap / Nominatim · centro aproximado do bairro · consulta 07/10/2026"
+  }
+}

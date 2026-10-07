@@ -40,3 +40,6 @@ A rotina lê um catálogo público limitado da Imobiliária Alex Tongo, sem aces
 
 ## Conexões testadas
 IBGE: renda per capita de Serra, Censo 2022, 10295/13431 (R$ 1.541,03). NASA: climatologia 2001–2020 no centro municipal aproximado (-20.12,-40.3); não é avaliação de inundação/vento extremo do imóvel. SENATRAN: a fonte retornou HTTP 403 na validação; frota permanece não informada. SGB: consulta técnica manual, não uma integração automática de risco. Dados imobiliários são anunciados, sem confirmação de disponibilidade. Não há dados privados da Autoglass. Áreas propostas são parâmetros ilustrativos editáveis, não dimensões conhecidas das unidades.
+
+## Mapa de oportunidades
+Leaflet 1.9.4 e OpenStreetMap. O mapa acompanha filtros e abre a análise do anúncio. Coordenadas aproximadas de bairro são identificadas explicitamente e não representam a localização exata do imóvel. Imóveis importados podem informar latitude, longitude, locationPrecision (property ou neighborhood), locationSource. Registros sem coordenadas permanecem na lista e são contados como não mapeados.
