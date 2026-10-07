@@ -1,0 +1,35 @@
+name: Atualizar imóveis públicos
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 */6 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: monitor-imoveis
+  cancel-in-progress: false
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar leitor de fontes públicas
+        run: pip install beautifulsoup4
+      - name: Consultar IBGE, NASA e anúncios públicos
+        run: python scripts/public_sources.py
+      - name: Consultar fontes autorizadas
+        env:
+          PROPERTY_FEEDS: ${{ secrets.PROPERTY_FEEDS }}
+        run: python scripts/monitor.py
+      - name: Salvar atualizações
+        run: |
+          if ! git diff --quiet -- data/; then
+            git config user.name "Prospecta Monitor"
+            git config user.email "prospecta@users.noreply.github.com"
+            git add data/
+            git commit -m "Atualizar imóveis e eventos de prospecção"
+            git push
+          fi
