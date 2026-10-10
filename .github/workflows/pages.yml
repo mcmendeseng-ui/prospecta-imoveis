@@ -25,6 +25,7 @@ jobs:
           cp index.html _site/
           cp visualizar-celular.html _site/
           cp assets/circula-materiais.png _site/assets/
+          cp assets/estoque-protegido.json _site/assets/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
